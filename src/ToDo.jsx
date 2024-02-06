@@ -1,4 +1,5 @@
 import React from "react"
+import Select from "react-select"
 import {
     ListItem,
     ListItemText,
@@ -22,7 +23,10 @@ class ToDo extends React.Component{
         //props는 상위 컴포넌트에서 전달한 데이터라서 읽기는 가능하지만 
         //수정이나 삭제가 안되므로 수정이나 삭제를 하고자 하는 경우는 
         //state로 변환
-        this.state = {item:props.item}
+        this.state = {item:props.item,
+            selectitem : []
+        }
+
         //App.js에서 넘겨준 삭제 함수를 현재 클래스의 데이터로 변환
         this.delete = this.props.delete
 
@@ -31,31 +35,62 @@ class ToDo extends React.Component{
     deleteEventHandler = (e) => {
         this.delete(this.state.item)
     }
-    
+    selectEventHandler = (selectedItem) => {
+        this.props.select(selectedItem);
+    };
     //화면에 출력할 내용을 리턴하는 메서드
     render() {
         //자주 사용하는 데이터를 짧게 사용하기 위해서 다른 변수에 대입
-        const item = this.state.item;
+        const {item, selectitem} = this.state;
+        //const option = [item.map((item, idx) =>( 
+        //    {value : {item}, label : {item}}
+        //  ))]
+        const options = this.state.item.map(item => ({ value: item, label: item }));
+
         return(
-           <ListItem>
-            <Checkbox checked = {item.done} />
+
+            <><Select
+                onChange = {this.selectEventHandler}
+                options={options}
+                placeholder={'x축'}
+                clearable={false} />
+            <Select
+                onChange = {this.selectEventHandler}
+                options={options}
+                placeholder={'y축'}
+                clearable={false} />
+
             <ListItemText>
                 <InputBase
                  inputProps = {{"aria-label":"naked"}}
                  type = "text"
-                 id = {item.id}
-                 name = {item.id}
-                 value = {item}
+                 id = {selectitem}
+                 name = {selectitem}
+                 value = {selectitem}
                  multiline = {true}
                  fullWidth = {true} />
-            </ListItemText>
+            </ListItemText> 
+            </>
 
-            <ListItemSecondaryAction>
-                <IconButton aria-label="Delete ToDo"  onClick={this.deleteEventHandler}>
-                    <DeleteOutlined />
-                </IconButton>
-            </ListItemSecondaryAction>
-           </ListItem>
+           //<ListItem>
+            //<Checkbox checked = {item.done} />
+            //<ListItemText>
+            //    <InputBase
+            //     inputProps = {{"aria-label":"naked"}}
+            //     type = "text"
+            //     id = {item.id}
+            //     name = {item.id}
+            //     value = {item}
+            //     multiline = {true}
+            //     fullWidth = {true} />
+            //</ListItemText>
+//
+           // <ListItemSecondaryAction>
+           //     <IconButton aria-label="Delete ToDo"  onClick={this.deleteEventHandler}>
+           //         <DeleteOutlined />
+           //     </IconButton>
+           // </ListItemSecondaryAction>
+           //</ListItem>
         )
     }
 }

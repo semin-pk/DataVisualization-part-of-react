@@ -62,25 +62,44 @@ class App extends React.Component {
     //원본에 다시 복사
     this.setState({items:newItems})
   }
-  
+  select = (item) => {
+    let request = new XMLHttpRequest()
+    //요청 준비
+    const url = 'http://127.0.0.1:8000/todo/?userid=VT-21700'
+    request.open('GET', url);
+    //요청
+    request.send('');
+    //응답처리
+    request.addEventListener('load', () =>{
+      //json 데이터 출력
+      
+      //console.log(request.responseText)
+      //JSON 문자열을 데이터로 변환
+      let data = JSON.parse(request.responseText);
+      console.log(data)
+      //서버에서 받아온 데이터를 state에 저장
+      this.setState({selectitem : data.list})
+    })
+  }
   render(){
     //배열을 순회하면서 출력할 내용을 생성
     //배열을 순회하면서 출력물을 만들 때는 key를 설정해주어야 함.
     //key를 설정하지않으면 출력에 문제가 없지만 콘솔에 에러가 출력
-    let display = this.state.items.length > 0 && (
-      <Paper style = {{margin:16}}>
-        <List>
-          {this.state.items.map((item, idx) =>( 
-            <ToDo item = {item} key = {idx} delete ={this.delete}/>
-          ))}
-        </List>
-      </Paper>
-    )
+    //let display = this.state.items.length > 0 && (
+    //  <Paper style = {{margin:16}}>
+    //    <List>
+    //      {this.state.items.map((item, idx) =>( 
+    //        <ToDo item = {item} key = {idx} delete ={this.delete}/>
+    //      ))}
+    //    </List>
+    //  </Paper>
+    //)
+  
     return(
       <div className = "App">
         <Container>
           <AddToDo add = {this.add} />
-          {display}
+          <ToDo item = {this.state.items} select = {this.select} />
         </Container>
       </div>
     )
