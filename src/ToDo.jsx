@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from 'react';
 import Select from "react-select"
 import {
     ListItem,
@@ -10,88 +10,72 @@ import {
 } from "@material-ui/core"
 
 import DeleteOutlined from "@material-ui/icons/DeleteOutlined"
-//react 에서 컴포넌트 클래스를 만들기 위해서 Component로 부터 상속을 받기
-class ToDo extends React.Component{
-    //생성자
-    constructor(props) {
-        //App.js에서 넘겨준 속성들을 자신의 props에 저장
-        //this.props.item이라는 속성에 앞에서 전달한 데이터를 저장
+
+function ToDo(props) {
+    const [x_choice, setXChoice] = useState('');
+    const [y_choice, setYChoice] = useState('');
+    const handleChange = (selectedItem, axis) => {
+        if(axis === 'x') {
+            const selectedValues_x = props.item_all.map((item_all) => 
+                item_all[selectedItem.value]
+            );
+            let dict_x = {};
+            selectedValues_x.forEach((x) => {
+                if (x in dict_x){
+                    dict_x[x] += 1;
+                }
+                else{
+                    dict_x[x] = 1;
+                }
+            });
+            setXChoice(dict_x);
+        } else {
+            const selectedValues_y = props.item_all.map((item_all) =>
+                item_all[selectedItem.value]
+            );
+            let dict_y = {};
+            selectedValues_y.forEach((y) => {
+                if (y in dict_y){
+                    dict_y[y] += 1;
+                }
+                else{
+                    dict_y[y] = 1;
+                }
+            });
+            setYChoice(dict_y);
+        }       
         
-        super(props); //상위 클래스에서 넘겨준 모든 props를 현재 클래스에 저장
-        //state 생성
-        //item이라는 이름으로 props 중에서 item이라는 값을 state로 저장
-        //props는 상위 컴포넌트에서 전달한 데이터라서 읽기는 가능하지만 
-        //수정이나 삭제가 안되므로 수정이나 삭제를 하고자 하는 경우는 
-        //state로 변환
-        this.state = {item:props.item,
-            selectitem : []
-        }
-
-        //App.js에서 넘겨준 삭제 함수를 현재 클래스의 데이터로 변환
-        this.delete = this.props.delete
-
     }
-    //삭제 버튼을 누를 때 호출될 이벤트 핸들러
-    deleteEventHandler = (e) => {
-        this.delete(this.state.item)
-    }
-    selectEventHandler = (selectedItem) => {
-        this.props.select(selectedItem);
-    };
-    //화면에 출력할 내용을 리턴하는 메서드
-    render() {
-        //자주 사용하는 데이터를 짧게 사용하기 위해서 다른 변수에 대입
-        const {item, selectitem} = this.state;
-        //const option = [item.map((item, idx) =>( 
-        //    {value : {item}, label : {item}}
-        //  ))]
-        const options = this.state.item.map(item => ({ value: item, label: item }));
 
-        return(
+    //const deleteEventHandler = () => {
+    //    props.delete(props.item);
+    //}
 
-            <><Select
-                onChange = {this.selectEventHandler}
+    const options = props.item.map(item => ({ value:item, label:item}));
+    //const selects_x = props.item_all.map(item_all => (item_all.quantity));
+    //const selects_y = props.item_all.map(item_all => (item_all.sales));
+
+
+
+    return (
+        <>
+            <Select
+                onChange={(selectedItem) => handleChange(selectedItem, 'x')}
+                value={x_choice}
                 options={options}
                 placeholder={'x축'}
-                clearable={false} />
+                clearable={false} 
+            />
             <Select
-                onChange = {this.selectEventHandler}
+                onChange={(selectedItem) => handleChange(selectedItem, 'y')}
+                value={y_choice}
                 options={options}
                 placeholder={'y축'}
-                clearable={false} />
-
-            <ListItemText>
-                <InputBase
-                 inputProps = {{"aria-label":"naked"}}
-                 type = "text"
-                 id = {selectitem}
-                 name = {selectitem}
-                 value = {selectitem}
-                 multiline = {true}
-                 fullWidth = {true} />
-            </ListItemText> 
-            </>
-
-           //<ListItem>
-            //<Checkbox checked = {item.done} />
-            //<ListItemText>
-            //    <InputBase
-            //     inputProps = {{"aria-label":"naked"}}
-            //     type = "text"
-            //     id = {item.id}
-            //     name = {item.id}
-            //     value = {item}
-            //     multiline = {true}
-            //     fullWidth = {true} />
-            //</ListItemText>
-//
-           // <ListItemSecondaryAction>
-           //     <IconButton aria-label="Delete ToDo"  onClick={this.deleteEventHandler}>
-           //         <DeleteOutlined />
-           //     </IconButton>
-           // </ListItemSecondaryAction>
-           //</ListItem>
-        )
-    }
+                clearable={false}
+            />
+            <h3>{JSON.stringify(x_choice)}  {JSON.stringify(y_choice)}</h3>
+        </>
+    );
 }
-export default ToDo
+
+export default ToDo;
