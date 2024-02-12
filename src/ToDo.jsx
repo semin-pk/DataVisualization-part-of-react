@@ -1,81 +1,74 @@
-import React, { useState } from 'react';
-import Select from "react-select"
-import {
-    ListItem,
-    ListItemText,
-    InputBase,
-    Checkbox,
-    ListItemSecondaryAction,
-    IconButton
-} from "@material-ui/core"
-
-import DeleteOutlined from "@material-ui/icons/DeleteOutlined"
+import React, { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import Select from 'react-select';
 
 function ToDo(props) {
-    const [x_choice, setXChoice] = useState('');
-    const [y_choice, setYChoice] = useState('');
-    const handleChange = (selectedItem, axis) => {
-        if(axis === 'x') {
-            const selectedValues_x = props.item_all.map((item_all) => 
-                item_all[selectedItem.value]
-            );
-            let dict_x = {};
-            selectedValues_x.forEach((x) => {
-                if (x in dict_x){
-                    dict_x[x] += 1;
-                }
-                else{
-                    dict_x[x] = 1;
-                }
-            });
-            setXChoice(dict_x);
-        } else {
-            const selectedValues_y = props.item_all.map((item_all) =>
-                item_all[selectedItem.value]
-            );
-            let dict_y = {};
-            selectedValues_y.forEach((y) => {
-                if (y in dict_y){
-                    dict_y[y] += 1;
-                }
-                else{
-                    dict_y[y] = 1;
-                }
-            });
-            setYChoice(dict_y);
-        }       
-        
+  const [x_choice, setXChoice] = useState('');
+  const [y_choice, setYChoice] = useState('');
+  const [data, setData] = useState([]);
+  let selectedValues_x = [];
+  let selectedValues_y = [];
+  let dict_x = {};
+  const handleChange = (selectedItem, axis) => {
+    if (axis === 'x') {
+      selectedValues_x = props.item_all.map((item_all) => item_all[selectedItem.value]);
+    } else {
+      selectedValues_y = props.item_all.map((item_all) => item_all[selectedItem.value]);
     }
 
-    //const deleteEventHandler = () => {
-    //    props.delete(props.item);
-    //}
+    if (selectedValues_x.length === selectedValues_y.length) {
+      selectedValues_x.forEach((x, index) => {
+        if (x in dict_x) {
+          dict_x[x] += selectedValues_y[index];
+        } else {
+          dict_x[x] = selectedValues_y[index];
+        }
+      });
+      
+      setXChoice(dict_x);
+      setYChoice(dict_x);
+      console.log('dict_x:', dict_x);
 
-    const options = props.item.map(item => ({ value:item, label:item}));
-    //const selects_x = props.item_all.map(item_all => (item_all.quantity));
-    //const selects_y = props.item_all.map(item_all => (item_all.sales));
+      const dataArray = Object.keys(dict_x).map((x) => ({
+        name: x,
+        value: dict_x[x],
+      }));
+      console.log(dataArray);
+      setData(dataArray);
+      
+    }
+  };
 
+  const options = props.item.map((item) => ({ value: item, label: item }));
 
+  return (
+    <>
+      <Select
+        onChange={(selectedItem) => handleChange(selectedItem, 'x')}
+        value={x_choice}
+        options={options}
+        placeholder={'x축'}
+        clearable={false}
+      />
+      <Select
+        onChange={(selectedItem) => handleChange(selectedItem, 'y')}
+        value={y_choice}
+        options={options}
+        placeholder={'y축'}
+        clearable={false}
+      />
 
-    return (
-        <>
-            <Select
-                onChange={(selectedItem) => handleChange(selectedItem, 'x')}
-                value={x_choice}
-                options={options}
-                placeholder={'x축'}
-                clearable={false} 
-            />
-            <Select
-                onChange={(selectedItem) => handleChange(selectedItem, 'y')}
-                value={y_choice}
-                options={options}
-                placeholder={'y축'}
-                clearable={false}
-            />
-            <h3>{JSON.stringify(x_choice)}  {JSON.stringify(y_choice)}</h3>
-        </>
-    );
+    
+
+      <BarChart width={1200} height={500} data={data}>
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="value" fill="#8884d8" />
+      </BarChart>
+    </>
+  );
 }
 
 export default ToDo;
